@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, FlatList, View, } from 'react-native';
+import { Button, FlatList, View, StyleSheet } from 'react-native';
 
 function App() {
   const [horizontal, setHorizontal] = useState(false);
