@@ -1,57 +1,49 @@
-import React, { useState } from 'react';
-import { Button, FlatList, View, StyleSheet } from 'react-native';
+import { useState } from 'react'
+import { ActivityIndicator, Animated, Button, FlatList, Image, ImageBackground, KeyboardAvoidingView, Pressable, RefreshControl, ScrollView, SectionList, Switch, Text, TextInput, TouchableHighlight, TouchableOpacity, View, VirtualizedList } from 'react-native'
 
-function App() {
-  const [horizontal, setHorizontal] = useState(false);
-  const onPress = () => setHorizontal(currentValue => !currentValue);
+export default function App() {
+  const [count, setCount] = useState(0)
+  const debugRef = (name: string) => (ref: unknown) => {
+    console.log(`Mounted ${name}. Ref is present: ${!!ref}`)
+
+    if (!ref) {
+      console.warn(`Ref ${name} is not present! It should call ref cleanup instead!`)
+    }
+
+    return () => {
+      console.log(`Unmounted ${name}`)
+    }
+  }
+
   return (
-    <View style={styles.container}>
-      <View style={styles.listContainer}>
-        <FlatList
-          ref={ref => {
-            console.log('Mount')
-            console.log(`NativeState: ${Boolean(ref?.getScrollResponder?.()?.getNativeScrollRef?.()?.__internalInstanceHandle?.stateNode?.node) ? '✅' : '❌'}`)
-
-            return () => {
-              console.log('Unmount')
-              console.log(`NativeState: ${Boolean(ref?.getScrollResponder?.()?.getNativeScrollRef?.()?.__internalInstanceHandle?.stateNode?.node) ? '✅' : '❌'}`)
-            }
-          }}
-          style={styles.flatList}
-          contentContainerStyle={styles.flatList}
-          accessibilityRole="adjustable"
-          contentInsetAdjustmentBehavior="never"
-          snapToAlignment="start"
-          nestedScrollEnabled
-          decelerationRate="fast"
-          automaticallyAdjustContentInsets={false}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          scrollEventThrottle={1}
-          // comment me
-          horizontal={horizontal}
-          data={[1]}
-          renderItem={() => null}
-        />
-      </View>
-      <Button onPress={onPress} title="Reload" />
+    <View ref={debugRef('view')} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 40 }}>
+      <Text ref={debugRef('text')}>Count: {count}</Text>
+      <Button ref={debugRef('button')} title="Force unmount" onPress={() => setCount(prev => prev + 1)} />
+      <ScrollView ref={debugRef('scrollview')} style={{ flex: 1 }}>
+        <Text>Scroll me</Text>
+      </ScrollView>
+      <ScrollView ref={debugRef('scrollviewHorizontal')} horizontal style={{ flex: 1 }}>
+        <Text>Scroll me horizontal</Text>
+      </ScrollView>
+      <FlatList ref={debugRef('flatlist')} data={[1]} renderItem={() => <Text>Item</Text>} />
+      <FlatList horizontal ref={debugRef('flatlistHorizontal')} data={[1]} renderItem={() => <Text>Item</Text>} />
+      <TextInput ref={debugRef('textinput')} />
+      <SectionList ref={debugRef('sectionlist')} sections={[{ data: [1], title: 'Section' }]} renderItem={() => <Text>Item</Text>} />
+      <Animated.View ref={debugRef('animated')} />
+      <ActivityIndicator ref={debugRef('activityindicator')} />
+      <Image ref={debugRef('image')} source={{ uri: 'https://via.placeholder.com/150' }} />
+      <ImageBackground ref={debugRef('imagebackground')} imageRef={debugRef('imagebackground_image')} source={{ uri: 'https://via.placeholder.com/150' }} />
+      <KeyboardAvoidingView ref={debugRef('keyboardavoidingview')} />
+      <Pressable ref={debugRef('pressable')} />
+      <Switch ref={debugRef('switch')} />
+      <RefreshControl ref={debugRef('refreshcontrol')} refreshing={false} />
+      <TouchableHighlight ref={debugRef('touchablehighlight')}>
+        <Text>TouchableHighlight</Text>
+      </TouchableHighlight>
+      <TouchableOpacity ref={debugRef('touchableopacity')}>
+        <Text>TouchableOpacity</Text>
+      </TouchableOpacity>
+      <VirtualizedList getItemCount={() => 1} ref={debugRef('virtualizedlist')} data={[1]} renderItem={() => <Text>Item</Text>} getItem={(item) => item} keyExtractor={(item) => item.toString()}/>
     </View>
-  );
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  listContainer: {
-    width: 150,
-  },
-  flatList: {
-    backgroundColor: 'lightblue',
-    height: 300,
-  },
-});
-
-export default App;
